@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppJam Expoagas 2026 | SmartRetail AI</title>
+    <style>
+        :root {
+            --primary: #004D99; /* Azul corporativo */
+            --secondary: #009933; /* Verde varejo/Expoagas */
+            --bg: #F5F7FA;
+            --text: #333333;
+            --danger: #D32F2F;
+        }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); }
+        header { background: var(--primary); color: white; padding: 30px 20px; text-align: center; border-bottom: 5px solid var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 2.5rem; letter-spacing: -0.5px; }
+        header p { margin: 10px 0 0 0; font-size: 1.1rem; opacity: 0.9; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #E4E7EB; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 15px rgba(0,0,0,0.08); }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; border-bottom: 2px solid #F0F2F5; padding-bottom: 12px; }
+        .card-header h2 { font-size: 1.3rem; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        /* Badge */
+        .badge { background: #E8F0FE; color: var(--primary); padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+        .badge.ai { background: linear-gradient(90deg, #9C27B0, #673AB7); color: white; }
+        /* Table */
+        table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #F0F2F5; }
+        th { color: #666; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; }
+        .status-red { color: var(--danger); font-weight: 600; background: #FFEBEE; padding: 4px 8px; border-radius: 4px; }
+        .status-yellow { color: #B26A00; font-weight: 600; background: #FFF8E1; padding: 4px 8px; border-radius: 4px; }
+        .status-green { color: var(--secondary); font-weight: 600; background: #E8F5E9; padding: 4px 8px; border-radius: 4px; }
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 6px; color: #555; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #D1D5DB; border-radius: 6px; font-size: 1rem; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus { border-color: var(--primary); }
+        .btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; font-size: 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #007A29; }
+        .result-panel { margin-top: 20px; padding: 16px; background: #F8FAFC; border-radius: 8px; border-left: 4px solid var(--secondary); display: none; }
+        .result-panel.active { display: block; animation: fadeIn 0.4s; }
+        .result-value { font-size: 1.5rem; font-weight: bold; color: var(--primary); margin-top: 8px; }
+        /* AI Insights */
+        .ai-insight { background: #FAFAFA; border: 1px solid #E4E7EB; border-radius: 8px; padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; }
+        .ai-insight::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(180deg, #9C27B0, #673AB7); }
+        .ai-insight h4 { margin: 0 0 8px 0; color: #333; }
+        .ai-insight p { margin: 0; font-size: 0.9rem; color: #666; line-height: 1.4; }
+        .ai-action { margin-top: 10px; font-size: 0.85rem; color: var(--primary); font-weight: 600; cursor: pointer; display: inline-block; }
+        /* Footer */
+        footer { background: white; border-top: 1px solid #E4E7EB; margin-top: 50px; padding: 40px 20px; text-align: center; }
+        .team-info { display: inline-block; text-align: left; background: #F8FAFC; padding: 20px 40px; border-radius: 8px; border: 1px dashed #CBD5E1; }
+        .team-info h3 { margin: 0 0 15px 0; color: var(--primary); }
+        .team-info p { margin: 5px 0; font-weight: 500; }
+        .team-info span { font-weight: normal; color: #666; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SmartRetail AI</h1>
+    <p>Solução Omnichannel & Analytics para o Setor Supermercadista | Expoagas 2026</p>
+</header>
+
+<div class="container">
+    <div class="dashboard">
+
+        <!-- Controle de Validade e Estoque -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📦 Controle de Mercadoria</h2>
+                <span class="badge">Supply Chain</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 0;">Monitoramento de perecíveis e giro de estoque.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Estoque</th>
+                        <th>Vencimento</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Leite Integral 1L</td>
+                        <td>450 un</td>
+                        <td>12/Ago/2026</td>
+                        <td><span class="status-red">Crítico</span></td>
+                    </tr>
+                    <tr>
+                        <td>Iogurte Morango</td>
+                        <td>120 un</td>
+                        <td>18/Ago/2026</td>
+                        <td><span class="status-yellow">Atenção</span></td>
+                    </tr>
+                    <tr>
+                        <td>Arroz Branco 5kg</td>
+                        <td>800 un</td>
+                        <td>10/Nov/2026</td>
+                        <td><span class="status-green">Normal</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- AI Promotion Suggestions -->
+        <div class="card">
+            <div class="card-header">
+                <h2>✨ Sugestões Inteligentes</h2>
+                <span class="badge ai">IA Generativa</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 0;">Promoções sugeridas com base no histórico de vendas e validade.</p>
+
+            <div class="ai-insight">
+                <h4>Leite Integral - Risco de Perda</h4>
+                <p>O lote de 450 un vence em breve. O algoritmo sugere aplicar um desconto de <strong>35%</strong> (mantendo margem operacional mínima) para liquidar o estoque rapidamente.</p>
+                <div class="ai-action" onclick="alert('Promoção enviada para os PDVs e E-commerce!')">Aplicar Promoção de 35% →</div>
+            </div>
+
+            <div class="ai-insight">
+                <h4>Cross-Selling: Arroz e Feijão</h4>
+                <p>Analytics indica que 68% das compras de Arroz levam Feijão. Sugestão: Criar combo físico e no app com 5% off na compra conjunta.</p>
+                <div class="ai-action" onclick="alert('Campanha Omnichannel ativada!')">Criar Combo →</div>
+            </div>
+        </div>
+
+        <!-- Calculadora de Preços -->
+        <div class="card">
+            <div class="card-header">
+                <h2>💲 Precificação Dinâmica</h2>
+                <span class="badge">Gestão Fiscal</span>
+            </div>
+            <p style="font-size: 0.9rem; color: #666; margin-top: 0;">Simulador para formação de preço considerando a base tributária.</p>
+
+            <div class="form-group">
+                <label for="custo">Custo de Aquisição (R$)</label>
+                <input type="number" id="custo" placeholder="Ex: 10.50" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="tributos">Carga Tributária Efetiva (ICMS/PIS/COFINS) %</label>
+                <input type="number" id="tributos" placeholder="Ex: 18" step="0.1" value="18">
+            </div>
+            <div class="form-group">
+                <label for="margem">Margem de Lucro Desejada %</label>
+                <input type="number" id="margem" placeholder="Ex: 30" step="0.1">
+            </div>
+            <button class="btn" onclick="calcularPreco()">Calcular Preço de Venda</button>
+
+            <div class="result-panel" id="result-panel">
+                <div style="font-size: 0.9rem; color: #666;">Preço de Venda Sugerido (Markup):</div>
+                <div class="result-value" id="preco-final">R$ 0,00</div>
+                <div style="font-size: 0.8rem; color: #555; margin-top: 10px; border-top: 1px solid #ddd; padding-top: 8px;">
+                    Composição: Custo (<span id="res-custo">R$ 0</span>) + Tributos (<span id="res-trib">R$ 0</span>) + Lucro (<span id="res-lucro">R$ 0</span>)
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Identificação da Equipe - Obrigatório -->
+<footer id="equipe">
+    <div class="team-info">
+        <h3>Identificação da Equipe - AppJam UniRitter</h3>
+        <p>Integrante 1: <span>[Seu Nome]</span> - <span>[Seu Email]</span> <br>
+           <small style="color:var(--primary); font-weight:bold;">Integração e Regras Fiscais</small>
+        </p>
+        <p>Integrante 2: <span>[Nome 2]</span> - <span>[Email 2]</span></p>
+        <p>Integrante 3: <span>[Nome 3]</span> - <span>[Email 3]</span></p>
+        <p>Repositório GitHub: <span><a href="#" style="color:var(--primary);">github.com/sua-equipe/expoagas-appjam</a></span></p>
+    </div>
+    <p style="margin-top: 30px; font-size: 0.8rem; color: #999;">Projeto desenvolvido exclusivamente para a AppJam Expoagas 2026.</p>
+</footer>
+
+<script>
+    function calcularPreco() {
+        const custo = parseFloat(document.getElementById('custo').value);
+        const tributos = parseFloat(document.getElementById('tributos').value) / 100;
+        const margem = parseFloat(document.getElementById('margem').value) / 100;
+
+        if (isNaN(custo) || isNaN(tributos) || isNaN(margem)) {
+            alert("Por favor, preencha todos os campos corretamente.");
+            return;
+        }
+
+        const divisor = 1 - tributos - margem;
+        if (divisor <= 0) {
+            alert("A soma de tributos e margem não pode ser maior ou igual a 100%.");
+            return;
+        }
+
+        const precoFinal = custo / divisor;
+        const valorTributos = precoFinal * tributos;
+        const valorLucro = precoFinal * margem;
+
+        document.getElementById('preco-final').innerText = precoFinal.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('res-custo').innerText = custo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('res-trib').innerText = valorTributos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        document.getElementById('res-lucro').innerText = valorLucro.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+        const panel = document.getElementById('result-panel');
+        panel.classList.remove('active');
+        void panel.offsetWidth; 
+        panel.classList.add('active');
+    }
+</script>
+</body>
+</html>
