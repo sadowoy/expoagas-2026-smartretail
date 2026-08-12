@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AppJam Expoagas 2026 | SmartRetail AI v2</title>
+    <style>
+        :root {
+            --primary: #004D99; /* Azul corporativo */
+            --secondary: #009933; /* Verde varejo/Expoagas */
+            --bg: #F0F4F8;
+            --text: #1E293B;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #3B82F6;
+            --border: #E2E8F0;
+        }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 0; background-color: var(--bg); color: var(--text); }
+        header { background: var(--primary); color: white; padding: 25px 20px; text-align: center; border-bottom: 4px solid var(--secondary); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 2.2rem; }
+        header p { margin: 8px 0 0 0; font-size: 1rem; color: #E0E7FF; }
+        .container { max-width: 1280px; margin: 25px auto; padding: 0 20px; }
+        
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .dashboard-full { grid-column: 1 / -1; }
+        
+        .card { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid var(--border); display: flex; flex-direction: column; }
+        .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .card-header h2 { font-size: 1.2rem; margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge.supply { background: #E0E7FF; color: var(--primary); }
+        .badge.ai { background: linear-gradient(135deg, #8B5CF6, #6D28D9); color: white; }
+        .badge.finance { background: #DCFCE7; color: var(--secondary); }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th, td { padding: 12px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { color: #64748B; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; background: #F8FAFC; }
+        
+        .status-critical { color: var(--danger); font-weight: 600; background: #FEE2E2; padding: 4px 8px; border-radius: 4px; display: inline-block; font-size: 0.8rem;}
+        .status-warning { color: #B45309; font-weight: 600; background: #FEF3C7; padding: 4px 8px; border-radius: 4px; display: inline-block; font-size: 0.8rem;}
+        .status-good { color: var(--secondary); font-weight: 600; background: #DCFCE7; padding: 4px 8px; border-radius: 4px; display: inline-block; font-size: 0.8rem;}
+        
+        .location-tag { font-size: 0.8rem; color: #64748B; display: block; margin-top: 4px; }
+        .location-tag strong { color: #475569; }
+        
+        .kpi-row { display: flex; gap: 15px; margin-bottom: 20px; }
+        .kpi-box { flex: 1; background: #F8FAFC; border: 1px solid var(--border); border-radius: 8px; padding: 15px; text-align: center; }
+        .kpi-title { font-size: 0.8rem; color: #64748B; font-weight: 600; text-transform: uppercase; }
+        .kpi-value { font-size: 1.5rem; font-weight: 700; margin-top: 5px; }
+        .kpi-value.loss { color: var(--danger); }
+        .kpi-value.saved { color: var(--secondary); }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #475569; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #CBD5E1; border-radius: 6px; font-size: 0.95rem; box-sizing: border-box; outline: none; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--primary); ring: 2px solid #E0E7FF; }
+        
+        .btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 12px; font-size: 1rem; font-weight: 600; border-radius: 6px; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #059669; }
+        
+        .result-panel { margin-top: 15px; padding: 15px; background: #F0FDF4; border-radius: 8px; border-left: 4px solid var(--secondary); display: none; }
+        .result-panel.active { display: block; animation: fadeIn 0.4s; }
+        
+        .alert-box { padding: 12px; border-radius: 6px; font-size: 0.85rem; margin-bottom: 10px; border-left: 4px solid; }
+        .alert-box.critical { background: #FEE2E2; border-color: var(--danger); color: #991B1B; }
+        .alert-box.warning { background: #FEF3C7; border-color: var(--warning); color: #92400E; }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Footer */
+        footer { background: white; border-top: 1px solid var(--border); margin-top: 40px; padding: 30px 20px; text-align: center; }
+        .team-info { display: inline-block; text-align: left; background: #F8FAFC; padding: 20px 40px; border-radius: 8px; border: 1px dashed #94A3B8; font-size: 0.9rem; }
+        .team-info h3 { margin: 0 0 10px 0; color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>SmartRetail AI</h1>
+    <p>Rastreabilidade, Gestão de Quebras e Reposição Inteligente</p>
+</header>
+
+<div class="container">
+    
+    <div class="dashboard-grid">
+        <!-- Rastreabilidade e Validade -->
+        <div class="card dashboard-full">
+            <div class="card-header">
+                <h2>📍 Rastreabilidade de Gôndola e Validade</h2>
+                <span class="badge supply">Supply Chain & Operação</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #64748B; margin-top: 0;">Monitoramento de perecíveis integrado com layout de loja (Planograma).</p>
+            
+            <div id="alerts-container">
+                <!-- Alertas injetados via JS -->
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto (Marca)</th>
+                        <th>Localização Exata</th>
+                        <th>Estoque</th>
+                        <th>Vencimento</th>
+                        <th>Status / Ação Sugerida</th>
+                    </tr>
+                </thead>
+                <tbody id="inventory-table">
+                    <!-- Tabela injetada via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Indicador de Prejuízo (Gestão Financeira) -->
+        <div class="card">
+            <div class="card-header">
+                <h2>📉 Análise de Margem Sacrificada</h2>
+                <span class="badge finance">Gestão Fiscal e de Quebras</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #64748B; margin-top: 0;">Impacto financeiro por vendas com desconto forçado (vencimento próximo).</p>
+            
+            <div class="kpi-row">
+                <div class="kpi-box">
+                    <div class="kpi-title">Quebra Estimada (S/ Ação)</div>
+                    <div class="kpi-value loss">R$ 1.240,00</div>
+                    <div style="font-size: 0.7rem; color: #64748B; margin-top: 4px;">Perda total se vencerem</div>
+                </div>
+                <div class="kpi-box">
+                    <div class="kpi-title">Margem Salva (IA Promo)</div>
+                    <div class="kpi-value saved">R$ 890,00</div>
+                    <div style="font-size: 0.7rem; color: #64748B; margin-top: 4px;">Recuperado via remarcação</div>
+                </div>
+            </div>
+
+            <div class="alert-box warning">
+                <strong>Análise:</strong> O Leite Marca X gerou R$ 150,00 de prejuízo direto em descontos nos últimos 7 dias para evitar perda total. É necessário ajustar a curva de compra.
+            </div>
+        </div>
+
+        <!-- Calculadora de Reposição Inteligente -->
+        <div class="card">
+            <div class="card-header">
+                <h2>🛒 Sugestão de Reposição Inteligente</h2>
+                <span class="badge ai">IA & Analytics</span>
+            </div>
+            <p style="font-size: 0.85rem; color: #64748B; margin-top: 0;">Cálculo do próximo lote de compras para evitar rupturas e excessos.</p>
+
+            <div class="form-group">
+                <label for="prod-select">Selecionar Produto para Reposição</label>
+                <select id="prod-select" onchange="carregarDadosProduto()">
+                    <option value="">Selecione...</option>
+                    <option value="leite">Leite Integral Marca X</option>
+                    <option value="iogurte">Iogurte Grego Marca Y</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px;">
+                <div class="form-group" style="flex: 1;">
+                    <label>Giro Médio (un/dia)</label>
+                    <input type="number" id="giro" readonly style="background: #F8FAFC;">
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Validade Média (dias)</label>
+                    <input type="number" id="validade" readonly style="background: #F8FAFC;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estoque Atual (un)</label>
+                <input type="number" id="estoque-atual" placeholder="Estoque na loja e depósito">
+            </div>
+
+            <button class="btn" onclick="calcularCompra()">Calcular Lote Ideal</button>
+
+            <div class="result-panel" id="purchase-result">
+                <div style="font-size: 0.85rem; color: #065F46; font-weight: bold;">Recomendação do Sistema:</div>
+                <div style="font-size: 1.4rem; font-weight: 700; color: var(--primary); margin: 5px 0;" id="lote-sugerido">0 un</div>
+                <div style="font-size: 0.8rem; color: #475569; border-top: 1px solid #C6F6D5; padding-top: 8px; margin-top: 5px;" id="justificativa-compra">
+                    Cálculo processado com base no giro.
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer id="equipe">
+    <div class="team-info">
+        <h3>Identificação da Equipe - AppJam UniRitter</h3>
+        <p>Integrante 1: <span>[Seu Nome]</span> - <span>[Seu Email]</span></p>
+        <p>Repositório GitHub: <span><a href="#" style="color:var(--primary);">github.com/sua-equipe/expoagas-appjam</a></span></p>
+    </div>
+</footer>
+
+<script>
+    // Dados simulados
+    const inventory = [
+        { nome: "Leite Integral", marca: "Marca X", corredor: "04", gondola: "B", prateleira: "3", estoque: 150, diasVencimento: 1, custo: 4.50 },
+        { nome: "Iogurte Grego", marca: "Marca Y", corredor: "Refrigerados 2", gondola: "A", prateleira: "1", estoque: 85, diasVencimento: 14, custo: 2.80 },
+        { nome: "Cerveja Pilsen", marca: "Marca Z", corredor: "08", gondola: "C", prateleira: "4", estoque: 400, diasVencimento: 45, custo: 3.20 }
+    ];
+
+    // Produtos para simulação de compra
+    const prodDB = {
+        'leite': { giro: 40, validadeMedia: 90 }, // Historicamente vence rápido na loja
+        'iogurte': { giro: 15, validadeMedia: 30 }
+    };
+
+    function renderizarTabela() {
+        const tbody = document.getElementById('inventory-table');
+        const alertsContainer = document.getElementById('alerts-container');
+        tbody.innerHTML = '';
+        alertsContainer.innerHTML = '';
+
+        inventory.forEach(item => {
+            let statusHtml = '';
+            let alertHtml = '';
+
+            // Lógica de rastreabilidade e alertas
+            if (item.diasVencimento <= 1) {
+                statusHtml = `<span class="status-critical">Remover P/ Quebra (-100%)</span>`;
+                alertHtml = `<div class="alert-box critical"><strong>URGENTE (Vence amanhã):</strong> ${item.nome} ${item.marca} - Retire da <strong>Gôndola ${item.gondola}, Prateleira ${item.prateleira} (Corredor ${item.corredor})</strong>.</div>`;
+            } else if (item.diasVencimento <= 15) {
+                statusHtml = `<span class="status-warning">Promo Sugerida (-30%)</span>`;
+                alertHtml = `<div class="alert-box warning"><strong>Atenção (Vence em ${item.diasVencimento} dias):</strong> Aplicar desconto no ${item.nome} ${item.marca} localizado no <strong>Corredor ${item.corredor}, Gôndola ${item.gondola}</strong> para acelerar o giro.</div>`;
+            } else {
+                statusHtml = `<span class="status-good">Normal</span>`;
+            }
+
+            if (alertHtml) alertsContainer.innerHTML += alertHtml;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><strong>${item.nome}</strong><br><span style="font-size:0.8rem; color:#64748B;">${item.marca}</span></td>
+                <td>Corredor ${item.corredor} <div class="location-tag">Gôndola <strong>${item.gondola}</strong> | Prat. <strong>${item.prateleira}</strong></div></td>
+                <td>${item.estoque} un</td>
+                <td>Em ${item.diasVencimento} dias</td>
+                <td>${statusHtml}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function carregarDadosProduto() {
+        const prod = document.getElementById('prod-select').value;
+        if (prod && prodDB[prod]) {
+            document.getElementById('giro').value = prodDB[prod].giro;
+            document.getElementById('validade').value = prodDB[prod].validadeMedia;
+        } else {
+            document.getElementById('giro').value = '';
+            document.getElementById('validade').value = '';
+        }
+    }
+
+    function calcularCompra() {
+        const giro = parseFloat(document.getElementById('giro').value);
+        const validade = parseFloat(document.getElementById('validade').value);
+        const estoqueAtual = parseFloat(document.getElementById('estoque-atual').value);
+
+        if (isNaN(giro) || isNaN(validade) || isNaN(estoqueAtual)) {
+            alert("Preencha todos os campos e selecione um produto.");
+            return;
+        }
+
+        // Lógica: Estoque Máximo Seguro (Para não vencer) = Giro * (Validade * Fator de Segurança de 70%)
+        // Não queremos comprar para durar a validade inteira, apenas para uns 15 dias de cobertura.
+        const coberturaDesejada = 15; // dias de estoque ideais
+        let sugestao = (giro * coberturaDesejada) - estoqueAtual;
+        
+        // Verifica se a sugestão vai causar vencimento
+        const capacidadeMaximaVidaUtil = giro * validade * 0.8; // margem de erro de 20%
+        
+        const panel = document.getElementById('purchase-result');
+        const justificativa = document.getElementById('justificativa-compra');
+
+        if (sugestao <= 0) {
+            document.getElementById('lote-sugerido').innerText = "0 un (Não comprar)";
+            document.getElementById('lote-sugerido').style.color = "var(--danger)";
+            justificativa.innerText = `O estoque atual (${estoqueAtual} un) já cobre os próximos ${Math.round(estoqueAtual/giro)} dias. Comprar mais geraria quebra operacional.`;
+        } else {
+            if ((sugestao + estoqueAtual) > capacidadeMaximaVidaUtil) {
+                sugestao = capacidadeMaximaVidaUtil - estoqueAtual;
+                justificativa.innerText = `Ajustado para baixo! Para evitar perdas por validade, o pedido foi reduzido considerando o giro diário de ${giro} un.`;
+            } else {
+                justificativa.innerText = `Lote ideal calculado para manter cobertura de ${coberturaDesejada} dias sem risco de vencimento na gôndola.`;
+            }
+            document.getElementById('lote-sugerido').innerText = Math.round(sugestao) + " un";
+            document.getElementById('lote-sugerido').style.color = "var(--primary)";
+        }
+
+        panel.classList.remove('active');
+        void panel.offsetWidth; 
+        panel.classList.add('active');
+    }
+
+    // Inicialização
+    renderizarTabela();
+</script>
+</body>
+</html>
